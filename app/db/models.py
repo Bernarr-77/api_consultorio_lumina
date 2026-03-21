@@ -24,3 +24,13 @@ class Provider(Base):
     bio: Mapped[str] = mapped_column(nullable=False)
     specialty: Mapped[str] = mapped_column(nullable=False)
     user: Mapped["User"]= relationship(back_populates="provider")
+    service: Mapped[list["Service"]] = relationship(back_populates="service_provider")
+
+class Service(Base):
+    __tablename__ = "servicos"
+    id: Mapped[int] = mapped_column(primary_key= True, autoincrement= True)
+    provider_id: Mapped[int] = mapped_column(ForeignKey("providers.id"))
+    name: Mapped[str] = mapped_column(nullable=False)
+    duration_minutes: Mapped[int] = mapped_column(nullable=False)
+    price: Mapped[float] = mapped_column(nullable=False)
+    service_provider: Mapped["Provider"] = relationship(back_populates='service')
