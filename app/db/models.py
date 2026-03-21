@@ -6,6 +6,10 @@ from datetime import datetime
 class StatusUsuario(enum.Enum):
     CLIENT = "client"
     PROVIDER = "provider"
+class Status(enum.Enum):
+    PENDENTE = 'pendente'
+    CONFIRMADO = 'confirmado'
+    CANCELADO = 'cancelado'
 
 class User(Base):
     __tablename__ = "usuarios"
@@ -16,6 +20,7 @@ class User(Base):
     role: Mapped[str] = mapped_column(Enum(StatusUsuario),nullable=False)
     created_at:Mapped[datetime] = mapped_column(default=datetime.now)
     provider: Mapped["Provider"] = relationship(back_populates="user")
+    agendamento: Mapped[list['Appointments']] = relationship(back_populates='agendamento_usuario')
 
 class Provider(Base):
     __tablename__ = "providers"
@@ -34,3 +39,15 @@ class Service(Base):
     duration_minutes: Mapped[int] = mapped_column(nullable=False)
     price: Mapped[float] = mapped_column(nullable=False)
     service_provider: Mapped["Provider"] = relationship(back_populates='service')
+    servicos_agendados: Mapped[list['Appointments']] = relationship(back_populates='agendamento_servico')
+
+class Appointments(Base):
+    __tablename__ = "agendamentos"
+    id: Mapped[int] = mapped_column(primary_key= True, autoincrement= True)
+    client_id: Mapped[int] = mapped_column(ForeignKey("usuarios.id"))
+    service_id: Mapped[int] = mapped_column(ForeignKey('servicos.id'))
+    agendado_em: Mapped[datetime] = mapped_column(default=datetime.now)
+    status: Mapped[str] = mapped_column(Enum(Status), nullable=False)
+    agendamento_usuario: Mapped['User'] = relationship(back_populates='agendamento')
+    agendamento_servico: Mapped['Service'] = relationship(back_populates= 'servicos_agendados')
+
