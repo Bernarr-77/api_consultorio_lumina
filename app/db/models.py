@@ -19,6 +19,7 @@ class User(Base):
     hashed_password: Mapped[str] = mapped_column(nullable=False)
     role: Mapped[str] = mapped_column(Enum(StatusUsuario),nullable=False)
     created_at:Mapped[datetime] = mapped_column(default=datetime.now)
+
     provider: Mapped["Provider"] = relationship(back_populates="user")
     agendamento: Mapped[list['Appointments']] = relationship(back_populates='agendamento_usuario')
 
@@ -28,6 +29,7 @@ class Provider(Base):
     user_id: Mapped[int] = mapped_column(ForeignKey("usuarios.id"))
     bio: Mapped[str] = mapped_column(nullable=False)
     specialty: Mapped[str] = mapped_column(nullable=False)
+
     user: Mapped["User"]= relationship(back_populates="provider")
     service: Mapped[list["Service"]] = relationship(back_populates="service_provider")
 
@@ -38,6 +40,7 @@ class Service(Base):
     name: Mapped[str] = mapped_column(nullable=False)
     duration_minutes: Mapped[int] = mapped_column(nullable=False)
     price: Mapped[float] = mapped_column(nullable=False)
+
     service_provider: Mapped["Provider"] = relationship(back_populates='service')
     servicos_agendados: Mapped[list['Appointments']] = relationship(back_populates='agendamento_servico')
 
@@ -48,6 +51,7 @@ class Appointments(Base):
     service_id: Mapped[int] = mapped_column(ForeignKey('servicos.id'))
     agendado_em: Mapped[datetime] = mapped_column(default=datetime.now)
     status: Mapped[str] = mapped_column(Enum(Status), nullable=False)
+    
     agendamento_usuario: Mapped['User'] = relationship(back_populates='agendamento')
     agendamento_servico: Mapped['Service'] = relationship(back_populates= 'servicos_agendados')
 

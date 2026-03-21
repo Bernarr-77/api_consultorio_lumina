@@ -11,3 +11,7 @@ class Base(DeclarativeBase):
 engine = create_engine(os.getenv("DATABASE_URL"))
 SessionLocal = sessionmaker(bind=engine, autocommit=False, autoflush=False)
 
+def get_db():
+    with SessionLocal() as db:
+        yield db
+
