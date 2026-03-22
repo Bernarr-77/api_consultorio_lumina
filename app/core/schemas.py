@@ -5,9 +5,6 @@ class UserInput(BaseModel):
     email: EmailStr
     password: str = Field(min_length=6, max_length= 72)
 
-class UserProcess(UserInput):
-    role: str = "client"
-
 class UserOutput(BaseModel):
     id: int 
     name: str

@@ -4,12 +4,12 @@ from sqlalchemy import String, Enum, ForeignKey
 import enum
 from datetime import datetime
 class StatusUsuario(enum.Enum):
-    CLIENT = "client"
-    PROVIDER = "provider"
+    CLIENT = "CLIENT"
+    PROVIDER = "PROVIDER"
 class Status(enum.Enum):
-    PENDENTE = 'pendente'
-    CONFIRMADO = 'confirmado'
-    CANCELADO = 'cancelado'
+    PENDENTE = 'PENDENTE'
+    CONFIRMADO = 'CONFIRMADO'
+    CANCELADO = 'CANCELADO'
 
 class User(Base):
     __tablename__ = "usuarios"
@@ -17,7 +17,7 @@ class User(Base):
     name: Mapped[str] = mapped_column(String(40), nullable= False)
     email:Mapped[str] = mapped_column(unique=True,nullable= False)
     hashed_password: Mapped[str] = mapped_column(nullable=False)
-    role: Mapped[str] = mapped_column(Enum(StatusUsuario),nullable=False)
+    role: Mapped[StatusUsuario] = mapped_column(Enum(StatusUsuario),nullable=False)
     created_at:Mapped[datetime] = mapped_column(default=datetime.now)
 
     provider: Mapped["Provider"] = relationship(back_populates="user")

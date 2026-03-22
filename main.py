@@ -1,4 +1,7 @@
 from fastapi import FastAPI
-from app.db.session import Base
+from app.api.users import router
 
 app = FastAPI()
+
+app.include_router(router)
+
