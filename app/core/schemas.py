@@ -19,7 +19,6 @@ class ProviderInput(BaseModel):
 
 class ProviderOutput(BaseModel):
     id: int
-    user_id: int
     bio: str
     specialty: str
     model_config = ConfigDict(from_attributes=True)

@@ -1,5 +1,7 @@
 from app.db.models import User,Provider
 from sqlalchemy.orm import Session
+from sqlalchemy import select
+from typing import Optional
 
 def register_user(db: Session ,nome,mail,password,new_role = "CLIENT"):
         new_user = User(name=nome,email=mail,
@@ -28,3 +30,15 @@ def register_provider(db: Session, id: int, biografia, especialidade, provider_r
                 return new_provider
         else:
                 return None
+def get_all_providers(db: Session, especialidade: Optional[str] = None):
+        query = select(Provider)
+        if especialidade is not None:
+                query = query.filter(Provider.specialty.ilike(f'%{especialidade}%'))
+                resultados = db.scalars(query).all()
+                if resultados:
+                        return resultados
+                return None
+        resultados = db.scalars(query).all()
+        if resultados:
+                return resultados
+        return None
