@@ -22,3 +22,16 @@ class ProviderOutput(BaseModel):
     bio: str
     specialty: str
     model_config = ConfigDict(from_attributes=True)
+
+class ServiceInput(BaseModel):
+    provider_id: int
+    name: str
+    duration_minutes: int
+    price: float
+
+class ServiceOutput(BaseModel):
+    id: int
+    provider_id: int
+    name: str
+    duration_minutes: int
+    price: float
