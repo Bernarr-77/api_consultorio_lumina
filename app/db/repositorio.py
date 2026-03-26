@@ -1,6 +1,6 @@
 from app.db.models import User,Provider,Service
 from sqlalchemy.orm import Session
-from sqlalchemy import select
+from sqlalchemy import select,delete
 from typing import Optional
 
 def register_user(db: Session ,nome,mail,password,new_role = "CLIENT"):
@@ -47,6 +47,15 @@ def get_provider_by_id(db: Session,id: int):
         if provider:
                 return provider
         return None
+
+def delete_provider(db: Session, id):
+        verificador = get_provider_by_id(db,id)
+        if verificador is None:
+                return None
+        query = delete(Provider).where(Provider.id == id)
+        resultado = db.execute(query)
+        db.commit()
+        return resultado
 
 def criar_services(db: Session, id: int, name, duracao, price:float):
         provedor = get_provider_by_id(db, id)

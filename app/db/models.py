@@ -31,7 +31,7 @@ class Provider(Base):
     specialty: Mapped[str] = mapped_column(nullable=False)
 
     user: Mapped["User"]= relationship(back_populates="provider")
-    service: Mapped[list["Service"]] = relationship(back_populates="service_provider")
+    service: Mapped[list["Service"]] = relationship(back_populates="service_provider",cascade='all, delete-orphan')
 
 class Service(Base):
     __tablename__ = "servicos"
@@ -42,7 +42,7 @@ class Service(Base):
     price: Mapped[float] = mapped_column(nullable=False)
 
     service_provider: Mapped["Provider"] = relationship(back_populates='service')
-    servicos_agendados: Mapped[list['Appointments']] = relationship(back_populates='agendamento_servico')
+    servicos_agendados: Mapped[list['Appointments']] = relationship(back_populates='agendamento_servico',cascade='all, delete-orphan')
 
 class Appointments(Base):
     __tablename__ = "agendamentos"

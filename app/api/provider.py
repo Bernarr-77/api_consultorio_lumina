@@ -1,6 +1,6 @@
 from fastapi import APIRouter, HTTPException, Depends
 from app.core.schemas import ProviderInput, ProviderOutput
-from app.db.repositorio import register_provider,get_all_providers, get_provider_by_id
+from app.db.repositorio import register_provider,get_all_providers, get_provider_by_id, delete_provider
 from app.db.session import get_db
 from typing import Optional, List
 
@@ -36,4 +36,13 @@ def buscar_pelo_id(id: int, db = Depends(get_db)):
     except Exception as error_500:
         raise HTTPException(status_code=500, detail=f"Erro desconhecido: {str(error_500)}")
     return retorno
-        
+
+@router_provider.delete("/deletar_provedor/")
+def apagar_provedor(id_provedor, db = Depends(get_db)):
+    try:
+        apagador = delete_provider(db, id_provedor)
+        if apagador is None:
+            raise HTTPException(status_code=404, detail= "Nenhum provider encontrado")   
+    except Exception as error_500:
+        raise HTTPException(status_code=500, detail=f"Erro desconhecido: {str(error_500)}")
+    return apagador
