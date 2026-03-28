@@ -51,6 +51,15 @@ def get_provider_by_id(db: Session,id: int):
                 return resultado
         return None
 
+def reativar_provider(db:Session, id_provider):
+        query = select(Provider).where(Provider.operando == StatusProvider.INATIVO, Provider.id == id_provider)
+        buscar = db.scalars(query).first()
+        if buscar:
+                buscar.operando = StatusProvider.ATIVO
+                db.commit()
+                return buscar
+        return None
+
 def delete_provider(db: Session, id):
         verificador = get_provider_by_id(db,id)
         if verificador is None:

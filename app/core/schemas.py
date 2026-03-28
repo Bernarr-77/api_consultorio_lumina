@@ -21,6 +21,7 @@ class ProvidersPatch(BaseModel):
     bio: Optional[str] = None
     specialty: Optional[str] = None
 class ProviderOutput(BaseModel):
+    name: str
     id: int
     bio: str
     specialty: str

@@ -37,6 +37,9 @@ class Provider(Base):
 
     user: Mapped["User"]= relationship(back_populates="provider")
     service: Mapped[list["Service"]] = relationship(back_populates="service_provider",cascade='all, delete-orphan')
+    @property
+    def name(self):
+        return self.user.name
 
 class Service(Base):
     __tablename__ = "servicos"

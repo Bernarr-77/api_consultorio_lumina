@@ -1,6 +1,6 @@
 from fastapi import APIRouter, HTTPException, Depends
 from app.core.schemas import ProviderInput, ProviderOutput,ProvidersPatch
-from app.db.repositorio import register_provider,get_all_providers, get_provider_by_id, delete_provider,atualizar_provider
+from app.db.repositorio import register_provider,get_all_providers, get_provider_by_id, delete_provider,atualizar_provider, reativar_provider
 from app.db.session import get_db
 from typing import Optional, List
 
@@ -58,3 +58,13 @@ def atualizar_provedor(dados: ProvidersPatch, id: int,  db = Depends(get_db)):
     except Exception as error_500:
         raise HTTPException(status_code=500, detail=f"Erro desconhecido: {str(error_500)}")
     return resultado
+
+@router_provider.patch("/reativar_provider/{id}", response_model=ProviderOutput)
+def reativacao_provider(id, db = Depends(get_db)):
+    try:
+        reativacao = reativar_provider(db, id)
+        if reativacao is None:
+            raise HTTPException(status_code=404, detail= "Nenhum provider inativo encontrado") 
+    except Exception as error_500:
+        raise HTTPException(status_code=500, detail=f"Erro desconhecido: {str(error_500)}")
+    return reativacao
