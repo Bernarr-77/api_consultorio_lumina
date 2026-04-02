@@ -50,5 +50,4 @@ class ServiceOutput(BaseModel):
 
 class AgendamentoInput(BaseModel):
     client_id: int
-    service_id:int
     data_hora_inicio: datetime

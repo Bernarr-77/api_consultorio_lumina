@@ -1,4 +1,4 @@
-from app.db.models import User,Provider,Service,StatusProvider
+from app.db.models import User,Provider,Service,StatusProvider, Status, Appointments
 from sqlalchemy.orm import Session
 from sqlalchemy import select,delete
 from typing import Optional
@@ -138,11 +138,19 @@ ROTAS AGENDAMENTOS
 ==============================================================================
 """
 
-def criar_agendamento(db:Session, id_servico:int,id_provider:int,hora_inicial:datetime):
+def criar_agendamento(db:Session, id_servico:int,id_provider:int,hora_inicial:datetime, id_usuario: int, status = 'PENDENTE'):
         servico = buscar_servico_id(db,id_provider, id_servico)
         if servico is None:
                 return None
-        hora_final = hora_inicial + timedelta(minutes=servico.duration_minutes)
-        if hora_inicial.hour < 9 or (hora_final.hour > 18 and hora_final.minute > 0) : 
-                pass
-        #inacabado
+        hora_final_novo = hora_inicial + timedelta(minutes=servico.duration_minutes)
+        if hora_inicial.hour < 9 or hora_final_novo.hour > 18 or ( hora_final_novo.hour == 18 and hora_final_novo.minute > 0 ): 
+                return 'Estabelecimento fechado'
+        query = select(Appointments).join(Service).filter(Service.provider_id == id_provider, Appointments.data_hora_inicio < hora_final_novo, Appointments.data_hora_fim > hora_inicial)
+        conflito = db.scalars(query).first()
+        if conflito:
+                return 'Horario ja tem pessoa marcada'
+        novo_agendamento = Appointments(client_id = id_usuario, service_id = id_servico, status = status, data_hora_inicio = hora_inicial, data_hora_fim = hora_final_novo)
+        db.add(novo_agendamento)
+        db.commit()
+        db.refresh(novo_agendamento)
+        return novo_agendamento
