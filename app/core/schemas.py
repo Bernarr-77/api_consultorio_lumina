@@ -45,15 +45,14 @@ class ServiceInput(BaseModel):
 
 
 class ServicePatch(BaseModel):
-    """Renomeado de servicePatch → ServicePatch (PascalCase para classes Pydantic)."""
+
     name: Optional[str] = None
     duration_minutes: Optional[int] = None
     price: Optional[float] = None
 
 
 class ServiceOutput(BaseModel):
-    """Corrigido: removido campo 'nome' duplicado/incorreto, adicionado 'provider_name'
-    que mapeia a @property 'nome' do modelo Service (nome do provider)."""
+
     id: int
     provider_name: str = Field(alias="nome")
     provider_id: int
@@ -70,8 +69,10 @@ class AgendamentoInput(BaseModel):
 
 class AgendamentosOutput(BaseModel):
     id: int
-    name_usuario: str
+    name_user: str
+    name_provider:str
     name_service: str
-    data_hora_inicio: datetime  # Corrigido typo: era 'data_hora_incio'
+    data_hora_inicio: datetime
     data_hora_fim: datetime
+    status: str
     model_config = ConfigDict(from_attributes=True)

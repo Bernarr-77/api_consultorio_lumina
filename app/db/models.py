@@ -69,8 +69,11 @@ class Appointments(Base):
     agendamento_servico: Mapped['Service'] = relationship(back_populates= 'servicos_agendados')
 
     @property
-    def name_usuario(self):
+    def name_user(self):
         return self.agendamento_usuario.name
     @property
     def name_service(self):
         return self.agendamento_servico.name
+    @property
+    def name_provider(self):
+        return self.agendamento_servico.service_provider.user.name

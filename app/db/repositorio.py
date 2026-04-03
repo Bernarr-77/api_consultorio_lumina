@@ -33,7 +33,10 @@ def get_user_by_id(db: Session, user_id: int) -> Optional[User]:
     """Busca um usuário pelo ID."""
     return db.get(User, user_id)
 
-
+def get_user_by_name(db: Session, name: str) -> list[User]:
+    """Busca usuários pelo nome (case-insensitive)."""
+    query = select(User).where(User.name.ilike(f"%{name}%"))
+    return list(db.scalars(query).all())
 # ==============================================================================
 # PROVIDER REPOSITORY
 # ==============================================================================
@@ -232,6 +235,9 @@ class AppointmentConflictError(ValueError):
     """Lançado quando já existe agendamento no horário solicitado."""
     pass
 
+class NoAppointmentNeeded(ValueError):
+    """Lançado quando não existe agendamento salvo"""
+
 
 def create_appointment(
     db: Session,
@@ -242,12 +248,6 @@ def create_appointment(
     status: str = "PENDENTE",
 ) -> Optional[Appointments]:
     """Cria um agendamento verificando horário de funcionamento e conflitos.
-
-    Raises:
-        AppointmentClosedError: Se o horário está fora do expediente (9h-18h).
-        AppointmentConflictError: Se já existe agendamento conflitante.
-
-    Retorna None se o serviço não for encontrado.
     """
     service = get_service_by_id(db, provider_id, service_id)
     if service is None:
@@ -265,6 +265,7 @@ def create_appointment(
             Service.provider_id == provider_id,
             Appointments.data_hora_inicio < end_time,
             Appointments.data_hora_fim > start_time,
+            Appointments.status == Status.PENDENTE
         )
     )
     conflict = db.scalars(conflict_query).first()
@@ -282,3 +283,36 @@ def create_appointment(
     db.commit()
     db.refresh(new_appointment)
     return new_appointment
+
+def get_appointment_by_id(
+    db: Session,
+    appointment_id: int,
+    client_id: int
+) -> Optional[Appointments]:
+    query = select(Appointments).where(Appointments.id == appointment_id, Appointments.client_id == client_id, Appointments.status == Status.PENDENTE)
+    result = db.scalars(query).first()
+    if result is None:
+        raise NoAppointmentNeeded("Não existe agendamento com esse ID")
+    return result
+
+def get_appointments_by_provider(
+    db: Session,
+    provider_id:int
+    ) -> Optional[Appointments]:
+    query = select(Appointments).join(Service).filter(Service.provider_id == provider_id, Appointments.status == Status.PENDENTE)
+    result = db.scalars(query).all()
+    if not result:
+        raise NoAppointmentNeeded("Não existe agendamento para esse provider")
+    return result
+
+def patch_appointment(
+    db: Session,
+    appointment_id: int,
+    client_id: int
+) -> Optional[Appointments]:
+    search_by_id = get_appointment_by_id(db, appointment_id,client_id)
+    if search_by_id is None:
+        raise NoAppointmentNeeded("Não existe agendamento com esse ID")
+    search_by_id.status = Status.CANCELADO
+    db.commit()
+    return search_by_id
