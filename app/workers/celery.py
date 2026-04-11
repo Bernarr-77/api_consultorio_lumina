@@ -2,7 +2,7 @@ from celery import Celery
 from dotenv import load_dotenv
 import os
 load_dotenv()
-app = Celery('app',    
+app = Celery('tasks_barbearia',    
             broker=os.getenv('BROKER_URL'),
             backend=os.getenv('BACKEND_URL'),
             include=['app.workers.task'])

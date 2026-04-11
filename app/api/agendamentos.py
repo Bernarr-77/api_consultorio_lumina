@@ -2,6 +2,8 @@ from fastapi import APIRouter, HTTPException, Depends
 from sqlalchemy.orm import Session
 from app.core.schemas import AgendamentoInput, AgendamentosOutput
 from app.db.session import get_db
+from app.workers.task import confirmacao_email
+from zoneinfo import ZoneInfo
 from app.db.repositorio import (
     create_appointment,
     AppointmentClosedError,
@@ -9,11 +11,11 @@ from app.db.repositorio import (
     NoAppointmentNeeded,
     get_appointment_by_id,
     get_appointments_by_provider,
-    patch_appointment
+    patch_appointment,
+    get_user_by_id
 )
 
 router_agendamentos = APIRouter(prefix="/appointments", tags=["Appointments"])
-
 
 @router_agendamentos.post("/{service_id}/{provider_id}", response_model=AgendamentosOutput)
 def create_appointment_route(
@@ -24,10 +26,13 @@ def create_appointment_route(
 ):
     """Cria um novo agendamento verificando horário e conflitos.
     """
+    data_fuso_sp = payload.data_hora_inicio.astimezone(ZoneInfo("America/Sao_Paulo"))
     try:
         appointment = create_appointment(
-            db, service_id, provider_id, payload.data_hora_inicio, payload.client_id
-        )
+            db, service_id, provider_id, payload.data_hora_inicio, payload.client_id)
+        verificator_user = get_user_by_id(db, payload.client_id)
+        if verificator_user is None:
+            raise HTTPException(status_code=404, detail="Usuario não encontrado")
         if appointment is None:
             raise HTTPException(status_code=404, detail="Serviço não encontrado")
     except HTTPException:
@@ -38,6 +43,9 @@ def create_appointment_route(
         raise HTTPException(status_code=409, detail="Horário já possui agendamento marcado")
     except Exception as exc:
         raise HTTPException(status_code=500, detail=f"Erro desconhecido: {str(exc)}")
+    inicio_formatado = appointment.data_hora_inicio.astimezone(ZoneInfo("America/Sao_Paulo")).strftime("%d/%m/%Y às %H:%M")
+    fim_formatado = appointment.data_hora_fim.astimezone(ZoneInfo("America/Sao_Paulo")).strftime("%d/%m/%Y às %H:%M")
+    confirmacao_email.delay(verificator_user.email, inicio_formatado, fim_formatado)
     return appointment
 
 @router_agendamentos.get("/{appointment_id}/{client_id}", response_model=AgendamentosOutput)
