@@ -6,7 +6,10 @@ from dotenv import load_dotenv
 
 load_dotenv()
 
-@app.task(name="enviar_email_confirmacao")
+@app.task(name="enviar_email_confirmacao",
+        autoretry_for=(Exception,),
+        max_retries=5,
+        default_retry_delay=15)
 def confirmacao_email(email_destino: str, inicio_formatado: str, fim_formatado: str):
     # 1. Pegamos as credenciais do cofre (.env)
     remetente = os.getenv("EMAIL_SENDER")
