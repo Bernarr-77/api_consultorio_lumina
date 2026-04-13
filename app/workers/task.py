@@ -1,7 +1,7 @@
 import os
 import smtplib
 from email.message import EmailMessage
-from app.workers.celery import app
+from app.workers.celery_app import app
 from dotenv import load_dotenv
 from app.db.session import SessionLocal
 from app.db.repositorio import cancel_appointment, get_user_by_id, get_appointment_by_id, get_appointment_status, NoAppointmentNeeded
@@ -471,7 +471,16 @@ def enviar_email_de_cancelamento(self, agendamento_id: int, client_id: int):
 
     db = SessionLocal()
     try:
-        agendamento = get_appointment_by_id(db, agendamento_id, client_id)
+        agendamento = get_appointment_status(db, agendamento_id)
+        if agendamento is None:
+            return "Agendamento não encontrado"
+
+        if agendamento.status == Status.CONFIRMADO:
+            return "Agendamento já foi confirmado"
+
+        if agendamento.status == Status.CANCELADO:
+            return "Agendamento já foi cancelado"
+
         usuario = get_user_by_id(db, client_id)
         if usuario is None:
             return "Usuário não encontrado"
@@ -480,12 +489,9 @@ def enviar_email_de_cancelamento(self, agendamento_id: int, client_id: int):
         inicio_formatado = agendamento.data_hora_inicio.strftime("%d/%m/%Y às %H:%M")
         fim_formatado = agendamento.data_hora_fim.strftime("%d/%m/%Y às %H:%M")
 
-        resultado = cancel_appointment(db, agendamento_id, client_id)
-        if resultado is None:
-            return "Agendamento já foi confirmado ou cancelado"
+        agendamento.status = Status.CANCELADO
+        db.commit()
 
-    except NoAppointmentNeeded:
-        return "Agendamento não encontrado"
     finally:
         db.close()
 
@@ -503,7 +509,7 @@ def enviar_email_de_cancelamento(self, agendamento_id: int, client_id: int):
     # 7. Fallback em texto simples
     msg.set_content(
         f"Olá! Seu agendamento #{agendamento_id:06d} para {inicio_formatado} foi cancelado "
-        f"pois não recebemos a confirmação dentro do prazo de 24 horas."
+        f"pois não recebemos a confirmação dentro do prazo."
     )
 
     # 8. Corpo HTML — tema escuro premium de barbearia (mesmo padrão do lembrete)
@@ -562,7 +568,7 @@ def enviar_email_de_cancelamento(self, agendamento_id: int, client_id: int):
                                 </p>
                                 <p style="margin: 0 0 28px 0; color: #999999; font-size: 15px; line-height: 1.7;">
                                     Infelizmente, seu agendamento foi <strong style="color: #e74c3c;">cancelado automaticamente</strong>
-                                    porque não recebemos a confirmação dentro do prazo de <strong style="color: #e74c3c;">24 horas</strong>.
+                                    porque não recebemos a confirmação dentro do prazo de <strong style="color: #e74c3c;">8 horas</strong>.
                                 </p>
 
                                 <!-- Card de detalhes -->

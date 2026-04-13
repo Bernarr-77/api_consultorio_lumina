@@ -14,4 +14,4 @@ app.conf.timezone = 'America/Sao_Paulo'
 app.conf.enable_utc = False
 
 
-# celery -A app.workers.celery worker --loglevel=info --pool=solo
+# celery -A app.workers.celery_app worker --loglevel=info --pool=solo
