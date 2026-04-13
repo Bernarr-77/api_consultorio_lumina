@@ -298,6 +298,13 @@ def get_appointment_by_id(
         raise NoAppointmentNeeded("Não existe agendamento com esse ID")
     return result
 
+def get_appointment_status(
+    db: Session,
+    appointment_id: int,
+) -> Optional[Appointments]:
+    """Busca um agendamento pelo ID sem filtrar por status."""
+    return db.get(Appointments, appointment_id)
+
 def get_appointments_by_provider(
     db: Session,
     provider_id:int

@@ -4,8 +4,8 @@ from email.message import EmailMessage
 from app.workers.celery import app
 from dotenv import load_dotenv
 from app.db.session import SessionLocal
-from app.db.repositorio import cancel_appointment, get_user_by_id, get_appointment_by_id, NoAppointmentNeeded
-
+from app.db.repositorio import cancel_appointment, get_user_by_id, get_appointment_by_id, get_appointment_status, NoAppointmentNeeded
+from app.db.models import Status
 load_dotenv()
 
 @app.task(name="enviar_email_pos_agendamento",
@@ -236,7 +236,7 @@ def enviar_email_lembrete(self, email_destino: str, inicio_formatado: str, fim_f
                                     <tr>
                                         <td style="padding: 14px 18px;">
                                             <p style="margin:0; color:#c8a400; font-size:13px; line-height:1.5;">
-                                                ⚠️ <strong>Atenção:</strong> O link de confirmação expira em <strong>24 horas</strong>.
+                                                ⚠️ <strong>Atenção:</strong> O link de confirmação expira em <strong>8 horas</strong>.
                                                 Caso não confirme, seu horário poderá ser liberado para outros clientes.
                                             </p>
                                         </td>
@@ -286,6 +286,14 @@ def enviar_email_lembrete(self, email_destino: str, inicio_formatado: str, fim_f
         max_retries=5,
         default_retry_delay=300)
 def enviar_email_lembrete_2h(self, email_destino: str, inicio_formatado: str, fim_formatado: str, agendamento_id: int):
+
+    db = SessionLocal()
+    try:
+        agendamento = get_appointment_status(db, agendamento_id)
+        if agendamento is None or agendamento.status != Status.CONFIRMADO:
+            return "Agendamento não está confirmado, lembrete não enviado"
+    finally:
+        db.close()
     remetente = os.getenv("EMAIL_SENDER")
     senha = os.getenv("EMAIL_PASSWORD")
     servidor_smtp = os.getenv("SMTP_SERVER")

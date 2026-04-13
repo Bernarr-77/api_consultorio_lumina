@@ -56,7 +56,7 @@ def create_appointment_route(
 
     if aviso_um_dia_antes > datetime.now(tz=ZoneInfo("America/Sao_Paulo")):
         enviar_email_lembrete.apply_async(args=[verificator_user.email, inicio_formatado, fim_formatado, appointment.id, payload.client_id], eta=aviso_um_dia_antes)
-        momento_expiracao = datetime.now(tz=ZoneInfo("America/Sao_Paulo")) + timedelta(hours=24)
+        momento_expiracao = inicio_sp - timedelta(hours=16)
         enviar_email_de_cancelamento.apply_async(args=[appointment.id, payload.client_id], eta=momento_expiracao)
     else:
         confirmar_agendamento(db, appointment.id, payload.client_id)
