@@ -52,8 +52,12 @@ def create_appointment_route(
     except Exception as exc:
         raise HTTPException(status_code=500, detail=f"Erro desconhecido: {str(exc)}")
 
-    inicio_sp = appointment.data_hora_inicio.astimezone(ZoneInfo("America/Sao_Paulo"))
-    fim_sp = appointment.data_hora_fim.astimezone(ZoneInfo("America/Sao_Paulo"))
+    if appointment.data_hora_inicio.tzinfo is None:
+        inicio_sp = appointment.data_hora_inicio.replace(tzinfo=ZoneInfo("America/Sao_Paulo"))
+        fim_sp = appointment.data_hora_fim.replace(tzinfo=ZoneInfo("America/Sao_Paulo"))
+    else:
+        inicio_sp = appointment.data_hora_inicio.astimezone(ZoneInfo("America/Sao_Paulo"))
+        fim_sp = appointment.data_hora_fim.astimezone(ZoneInfo("America/Sao_Paulo"))
 
     inicio_formatado = inicio_sp.strftime("%d/%m/%Y às %H:%M")
     fim_formatado = fim_sp.strftime("%d/%m/%Y às %H:%M")
@@ -89,8 +93,13 @@ def get_busy_times(provider_id: int = Path(..., gt=0, le=2147483647), data: date
         times = get_busy_times_by_provider(db, provider_id, data)
         busy_slots = set()
         for inicio, fim in times:
-            current = inicio.astimezone(ZoneInfo("America/Sao_Paulo"))
-            end_time = fim.astimezone(ZoneInfo("America/Sao_Paulo"))
+            if inicio.tzinfo is None:
+                current = inicio.replace(tzinfo=ZoneInfo("America/Sao_Paulo"))
+                end_time = fim.replace(tzinfo=ZoneInfo("America/Sao_Paulo"))
+            else:
+                current = inicio.astimezone(ZoneInfo("America/Sao_Paulo"))
+                end_time = fim.astimezone(ZoneInfo("America/Sao_Paulo"))
+                
             while current < end_time:
                 busy_slots.add(current.strftime("%H:%M"))
                 current += timedelta(minutes=30)

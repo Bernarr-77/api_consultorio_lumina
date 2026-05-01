@@ -72,9 +72,12 @@ export default function BookingPage() {
   };
 
   const getMinDate = () => {
-    const tomorrow = new Date();
-    tomorrow.setDate(tomorrow.getDate() + 1);
-    return tomorrow.toISOString().split('T')[0];
+    const today = new Date();
+    const sp = new Date(today.toLocaleString('en-US', { timeZone: 'America/Sao_Paulo' }));
+    const year = sp.getFullYear();
+    const month = String(sp.getMonth() + 1).padStart(2, '0');
+    const day = String(sp.getDate()).padStart(2, '0');
+    return `${year}-${month}-${day}`;
   };
 
   const getMaxDate = () => {
@@ -218,22 +221,35 @@ export default function BookingPage() {
               <div className="timeslots-section animate-fade-in">
                 <label>Horários disponíveis</label>
                 <div className="timeslots-grid" id="timeslots-grid">
-                  {timeSlots.filter(t => !busyTimes.includes(t)).length > 0 ? (
-                    timeSlots.filter(t => !busyTimes.includes(t)).map((time) => (
-                      <button
-                        key={time}
-                        className={`timeslot ${selectedTime === time ? 'active' : ''}`}
-                        onClick={() => setSelectedTime(time)}
-                        id={`slot-${time.replace(':', '')}`}
-                      >
-                        {time}
-                      </button>
-                    ))
-                  ) : (
-                    <p style={{ gridColumn: '1 / -1', textAlign: 'center', color: 'var(--text-secondary)' }}>
-                      Nenhum horário disponível para esta data.
-                    </p>
-                  )}
+                  {(() => {
+                    const availableSlots = timeSlots.filter(t => {
+                      if (busyTimes.includes(t)) return false;
+                      if (selectedDate === getMinDate()) {
+                        const now = new Date();
+                        const spNow = new Date(now.toLocaleString('en-US', { timeZone: 'America/Sao_Paulo' }));
+                        const currentTimeStr = `${String(spNow.getHours()).padStart(2, '0')}:${String(spNow.getMinutes()).padStart(2, '0')}`;
+                        if (t < currentTimeStr) return false;
+                      }
+                      return true;
+                    });
+                    
+                    return availableSlots.length > 0 ? (
+                      availableSlots.map((time) => (
+                        <button
+                          key={time}
+                          className={`timeslot ${selectedTime === time ? 'active' : ''}`}
+                          onClick={() => setSelectedTime(time)}
+                          id={`slot-${time.replace(':', '')}`}
+                        >
+                          {time}
+                        </button>
+                      ))
+                    ) : (
+                      <p style={{ gridColumn: '1 / -1', textAlign: 'center', color: 'var(--text-secondary)' }}>
+                        Nenhum horário disponível para esta data.
+                      </p>
+                    );
+                  })()}
                 </div>
               </div>
             )}

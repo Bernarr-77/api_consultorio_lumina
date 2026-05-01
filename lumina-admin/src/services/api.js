@@ -4,15 +4,13 @@ const API_BASE_URL = 'http://127.0.0.1:8000';
 
 const api = axios.create({
   baseURL: API_BASE_URL,
-  headers: {
-    'Content-Type': 'application/json',
-  },
+  headers: { 'Content-Type': 'application/json' },
 });
 
-// Request Interceptor: Injeta o Access Token em toda requisição
+// Injeta o token admin em toda requisição
 api.interceptors.request.use(
   (config) => {
-    const token = localStorage.getItem('access_token');
+    const token = localStorage.getItem('admin_token');
     if (token) {
       config.headers.Authorization = `Bearer ${token}`;
     }
@@ -21,40 +19,30 @@ api.interceptors.request.use(
   (error) => Promise.reject(error)
 );
 
-// Response Interceptor: Se receber 401, tenta renovar o token
+// Tenta refresh se der 401
 api.interceptors.response.use(
   (response) => response,
   async (error) => {
     const originalRequest = error.config;
-
     if (error.response?.status === 401 && !originalRequest._retry) {
       originalRequest._retry = true;
-
       try {
-        const refreshToken = localStorage.getItem('refresh_token');
-        if (!refreshToken) {
-          throw new Error('No refresh token');
-        }
-
+        const refreshToken = localStorage.getItem('admin_refresh_token');
+        if (!refreshToken) throw new Error('No refresh token');
         const response = await axios.post(`${API_BASE_URL}/refresh`, {
           refresh_token: refreshToken,
         });
-
         const { access_token } = response.data;
-        localStorage.setItem('access_token', access_token);
-
+        localStorage.setItem('admin_token', access_token);
         originalRequest.headers.Authorization = `Bearer ${access_token}`;
         return api(originalRequest);
-      } catch (refreshError) {
-        // Refresh falhou: limpa tudo e redireciona para login
-        localStorage.removeItem('access_token');
-        localStorage.removeItem('refresh_token');
-        localStorage.removeItem('user');
+      } catch {
+        localStorage.removeItem('admin_token');
+        localStorage.removeItem('admin_refresh_token');
         window.location.href = '/login';
-        return Promise.reject(refreshError);
+        return Promise.reject(error);
       }
     }
-
     return Promise.reject(error);
   }
 );

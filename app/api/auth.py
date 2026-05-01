@@ -69,15 +69,6 @@ def refresh(refresh_data: RefreshTokenInput, db: Session = Depends(get_db)):
         "token_type": "bearer"
     }
 
-@router_auth.get("/test-auth")
-def test_auth(token: str = Depends(oauth2_scheme), db: Session = Depends(get_db)):
-    user_id = verify_token(token)
-    if not user_id:
-        raise HTTPException(status_code=401, detail="Token inválido ou expirado")
-    user = get_user_by_id(db, int(user_id))
-    return {"message": "Autenticação funcionando!", "user": user}
-
-
 @router_auth.post("/forgot-password")
 def forgot_password(input_data: ForgotPasswordInput, db: Session = Depends(get_db)):
     user = get_user_by_email(db, input_data.email)

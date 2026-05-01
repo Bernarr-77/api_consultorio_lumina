@@ -2,7 +2,7 @@ from fastapi import APIRouter, HTTPException, Depends, Path, Query
 from sqlalchemy.orm import Session
 from sqlalchemy.exc import IntegrityError
 from typing import Optional, List
-from app.api.auth import require_provider
+from app.api.auth import require_provider, get_current_user
 from app.core.schemas import ProviderInput, ProviderOutput, ProvidersPatch
 from app.db.repositorio import (
     register_provider,
@@ -34,7 +34,7 @@ def register_provider_route(payload: ProviderInput, db: Session = Depends(get_db
     return provider
 
 
-@router_provider.get("/", response_model=List[ProviderOutput])
+@router_provider.get("/", response_model=List[ProviderOutput],dependencies=[Depends(get_current_user)])
 def get_all_providers_route(specialty: Optional[str] = Query(None, min_length=1, max_length=100), db: Session = Depends(get_db)):
     """Busca todos os providers ativos, com filtro opcional por especialidade."""
     try:

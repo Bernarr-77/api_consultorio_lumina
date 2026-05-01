@@ -328,7 +328,7 @@ def get_appointment_by_id(
     appointment_id: int,
     client_id: int
 ) -> Optional[Appointments]:
-    query = select(Appointments).where(Appointments.id == appointment_id, Appointments.client_id == client_id, Appointments.status == Status.PENDENTE)
+    query = select(Appointments).where(Appointments.id == appointment_id, Appointments.client_id == client_id)
     result = db.scalars(query).first()
     if result is None:
         raise NoAppointmentNeeded("Não existe agendamento com esse ID")
@@ -345,7 +345,7 @@ def get_appointments_by_provider(
     db: Session,
     provider_id:int
     ) -> Optional[Appointments]:
-    query = select(Appointments).join(Service).filter(Service.provider_id == provider_id, Appointments.status == Status.PENDENTE)
+    query = select(Appointments).join(Service).filter(Service.provider_id == provider_id)
     result = db.scalars(query).all()
     if not result:
         raise NoAppointmentNeeded("Não existe agendamento para esse provider")

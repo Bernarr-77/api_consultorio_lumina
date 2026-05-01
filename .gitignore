@@ -222,3 +222,10 @@ uploads/
 .vercel
 .env*.local
 *.db
+node_modules/
+dist/
+build/
+.next/
+.idea/
+.vscode/
+
