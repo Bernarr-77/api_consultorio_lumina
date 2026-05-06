@@ -61,25 +61,21 @@ const NAV_ITEMS = [
   },
 ];
 
-
-function ThemeToggle() {
-  const [dark, setDark] = useState(() => {
-    return localStorage.getItem('admin_theme') === 'dark';
-  });
-
-  useEffect(() => {
-    document.documentElement.setAttribute('data-theme', dark ? 'dark' : 'light');
-    localStorage.setItem('admin_theme', dark ? 'dark' : 'light');
-  }, [dark]);
-
+// Componente stateless — recebe o estado e a função de toggle do pai
+function ThemeToggle({ dark, onToggle }) {
   return (
-    <button className="theme-toggle" onClick={() => setDark(!dark)} title={dark ? 'Modo claro' : 'Modo escuro'}>
+    <button className="theme-toggle" onClick={onToggle} title={dark ? 'Modo claro' : 'Modo escuro'}>
       {dark ? (
         <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
-          <circle cx="12" cy="12" r="5"/><line x1="12" y1="1" x2="12" y2="3"/><line x1="12" y1="21" x2="12" y2="23"/>
-          <line x1="4.22" y1="4.22" x2="5.64" y2="5.64"/><line x1="18.36" y1="18.36" x2="19.78" y2="19.78"/>
-          <line x1="1" y1="12" x2="3" y2="12"/><line x1="21" y1="12" x2="23" y2="12"/>
-          <line x1="4.22" y1="19.78" x2="5.64" y2="18.36"/><line x1="18.36" y1="5.64" x2="19.78" y2="4.22"/>
+          <circle cx="12" cy="12" r="5"/>
+          <line x1="12" y1="1" x2="12" y2="3"/>
+          <line x1="12" y1="21" x2="12" y2="23"/>
+          <line x1="4.22" y1="4.22" x2="5.64" y2="5.64"/>
+          <line x1="18.36" y1="18.36" x2="19.78" y2="19.78"/>
+          <line x1="1" y1="12" x2="3" y2="12"/>
+          <line x1="21" y1="12" x2="23" y2="12"/>
+          <line x1="4.22" y1="19.78" x2="5.64" y2="18.36"/>
+          <line x1="18.36" y1="5.64" x2="19.78" y2="4.22"/>
         </svg>
       ) : (
         <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
@@ -93,6 +89,24 @@ function ThemeToggle() {
 export default function Layout() {
   const { user, logout } = useAuth();
   const location = useLocation();
+
+  // Estado único do tema — evita conflito entre os dois botões toggle
+  const [dark, setDark] = useState(() => {
+    return localStorage.getItem('admin_theme') === 'dark';
+  });
+
+  useEffect(() => {
+    if (dark) {
+      document.documentElement.setAttribute('data-theme', 'dark');
+    } else {
+      document.documentElement.removeAttribute('data-theme');
+    }
+    localStorage.setItem('admin_theme', dark ? 'dark' : 'light');
+  }, [dark]);
+
+  function toggleTheme() {
+    setDark(prev => !prev);
+  }
 
   return (
     <div className="admin-layout">
@@ -124,10 +138,12 @@ export default function Layout() {
         </nav>
 
         <div className="sidebar-footer">
-          <ThemeToggle />
+          <ThemeToggle dark={dark} onToggle={toggleTheme} />
           <button className="sidebar-logout" onClick={logout}>
             <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
-              <path d="M9 21H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h4"/><polyline points="16 17 21 12 16 7"/><line x1="21" y1="12" x2="9" y2="12"/>
+              <path d="M9 21H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h4"/>
+              <polyline points="16 17 21 12 16 7"/>
+              <line x1="21" y1="12" x2="9" y2="12"/>
             </svg>
             <span>Sair</span>
           </button>
@@ -146,11 +162,11 @@ export default function Layout() {
               {location.pathname === '/finance' && 'Financeiro'}
             </h2>
           </div>
-        <div className="topbar-right">
+          <div className="topbar-right">
             <div className="topbar-avatar" title={user?.name}>
               {user?.name?.charAt(0)?.toUpperCase()}
             </div>
-            <ThemeToggle />
+            <ThemeToggle dark={dark} onToggle={toggleTheme} />
           </div>
         </header>
 

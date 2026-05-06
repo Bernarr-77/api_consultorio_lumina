@@ -7,6 +7,7 @@
 
 /* ---- Design Tokens ---- */
 :root {
+  color-scheme: light;
   /* Primary Palette (Mint Green) */
   --primary: #AAF0D1;
   --primary-dark: #7EDDB5;
@@ -116,6 +117,7 @@
 
 /* ---- Dark Mode ---- */
 [data-theme="dark"] {
+  color-scheme: dark;
   --neutral-50: #151A18;
   --neutral-100: #1A201E;
   --neutral-200: #242D2A;
@@ -283,8 +285,8 @@ ul, ol { list-style: none; }
 .input-field {
   width: 100%;
   padding: var(--space-md) var(--space-lg);
-  background-color: var(--bg-elevated);
-  border: 1.5px solid var(--neutral-200);
+  background-color: var(--bg-primary); /* Fundo um pouco mais escuro/inset */
+  border: 1.5px solid var(--neutral-300); /* Borda mais visível */
   border-radius: var(--radius-md);
   font-size: var(--text-base);
   color: var(--text-primary);

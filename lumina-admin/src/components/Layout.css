@@ -198,6 +198,14 @@
   padding-bottom: calc(var(--bottomnav-height) + var(--space-2xl));
 }
 
+/* Mobile: menos padding lateral para o calendário caber */
+@media (max-width: 767px) {
+  .admin-content {
+    padding: var(--space-md);
+    padding-bottom: calc(var(--bottomnav-height) + var(--space-xl));
+  }
+}
+
 /* ---- Bottom Nav (Mobile) ---- */
 .bottom-nav {
   display: flex;

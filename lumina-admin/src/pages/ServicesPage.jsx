@@ -10,6 +10,7 @@ export default function ServicesPage() {
   const [loading, setLoading] = useState(true);
   const [showModal, setShowModal] = useState(false);
   const [editingService, setEditingService] = useState(null);
+  const [showConfirm, setShowConfirm] = useState(false);
   const [toast, setToast] = useState(null);
 
   // Form
@@ -71,6 +72,7 @@ export default function ServicesPage() {
 
   function closeModal() {
     setShowModal(false);
+    setShowConfirm(false);
     setEditingService(null);
   }
 
@@ -100,6 +102,27 @@ export default function ServicesPage() {
       fetchAll();
     } catch (err) {
       showToast(err.response?.data?.detail || 'Erro ao salvar', 'error');
+    } finally {
+      setSaving(false);
+    }
+  }
+
+  function handleDeleteClick() {
+    setShowConfirm(true);
+  }
+
+  async function executeDelete() {
+    if (!editingService) return;
+    
+    setSaving(true);
+    try {
+      await api.delete(`/services/${editingService.provider_id}/${editingService.id}`);
+      showToast('Serviço excluído com sucesso!');
+      setShowConfirm(false);
+      closeModal();
+      fetchAll();
+    } catch (err) {
+      showToast(err.response?.data?.detail || 'Erro ao excluir serviço', 'error');
     } finally {
       setSaving(false);
     }
@@ -235,13 +258,63 @@ export default function ServicesPage() {
                 </div>
               </div>
 
-              <div className="modal-actions">
-                <button type="button" className="btn btn-secondary" onClick={closeModal}>Cancelar</button>
-                <button type="submit" className="btn btn-primary" disabled={saving}>
-                  {saving ? <div className="spinner" style={{ borderTopColor: '#111514' }} /> : (editingService ? 'Salvar' : 'Criar Serviço')}
-                </button>
+              <div className="modal-actions" style={{ justifyContent: editingService ? 'space-between' : 'flex-end', width: '100%' }}>
+                {editingService && (
+                  <button type="button" className="btn btn-secondary" style={{ color: 'var(--error)', borderColor: 'rgba(229,57,53,0.3)', backgroundColor: 'transparent' }} onClick={handleDeleteClick} disabled={saving}>
+                    Excluir
+                  </button>
+                )}
+                <div style={{ display: 'flex', gap: '12px' }}>
+                  <button type="button" className="btn btn-secondary" onClick={closeModal}>Cancelar</button>
+                  <button type="submit" className="btn btn-primary" disabled={saving}>
+                    {saving ? <div className="spinner" style={{ borderTopColor: '#111514' }} /> : (editingService ? 'Salvar' : 'Criar Serviço')}
+                  </button>
+                </div>
               </div>
             </form>
+          </div>
+        </div>
+      )}
+
+      {/* Confirm Delete Modal */}
+      {showConfirm && (
+        <div className="modal-overlay" style={{ zIndex: 1100, backgroundColor: 'rgba(0, 0, 0, 0.7)' }} onClick={() => setShowConfirm(false)}>
+          <div className="modal-content animate-fade-in-up" style={{ maxWidth: '400px', padding: '32px 24px' }} onClick={e => e.stopPropagation()}>
+            <div style={{ display: 'flex', flexDirection: 'column', alignItems: 'center', textAlign: 'center', gap: '20px' }}>
+              <div style={{ width: '56px', height: '56px', borderRadius: '50%', backgroundColor: 'rgba(229,57,53,0.12)', color: 'var(--error)', display: 'flex', alignItems: 'center', justifyContent: 'center' }}>
+                <svg width="28" height="28" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round">
+                  <path d="M3 6h18"></path>
+                  <path d="M19 6v14c0 1-1 2-2 2H7c-1 0-2-1-2-2V6"></path>
+                  <path d="M8 6V4c0-1 1-2 2-2h4c1 0 2 1 2 2v2"></path>
+                  <line x1="10" y1="11" x2="10" y2="17"></line>
+                  <line x1="14" y1="11" x2="14" y2="17"></line>
+                </svg>
+              </div>
+              <div>
+                <h3 style={{ margin: '0 0 8px 0', fontSize: '20px', color: 'var(--text-primary)', fontWeight: '600' }}>Excluir Serviço</h3>
+                <p style={{ margin: 0, color: 'var(--text-secondary)', fontSize: '15px', lineHeight: '1.5' }}>
+                  Tem certeza que deseja excluir o serviço <strong style={{ color: 'var(--text-primary)' }}>"{editingService?.name}"</strong>? Esta ação não poderá ser desfeita.
+                </p>
+              </div>
+              <div style={{ display: 'flex', gap: '12px', width: '100%', marginTop: '12px' }}>
+                <button 
+                  className="btn btn-secondary" 
+                  style={{ flex: 1, height: '48px' }} 
+                  onClick={() => setShowConfirm(false)}
+                  disabled={saving}
+                >
+                  Cancelar
+                </button>
+                <button 
+                  className="btn btn-primary" 
+                  style={{ flex: 1, height: '48px', backgroundColor: 'var(--error)', color: 'white', border: 'none', boxShadow: '0 4px 12px rgba(229, 57, 53, 0.25)' }} 
+                  onClick={executeDelete}
+                  disabled={saving}
+                >
+                  {saving ? <div className="spinner" style={{ borderTopColor: 'rgba(255,255,255,0.3)', borderRightColor: 'white' }} /> : 'Sim, excluir'}
+                </button>
+              </div>
+            </div>
           </div>
         </div>
       )}

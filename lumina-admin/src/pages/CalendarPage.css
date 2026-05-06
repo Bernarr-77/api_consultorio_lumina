@@ -7,6 +7,7 @@
 /* Calendar Widget */
 .calendar-widget {
   padding: var(--space-lg);
+  overflow: hidden;
 }
 .calendar-header {
   display: flex;
@@ -406,5 +407,59 @@
 @media (min-width: 1024px) {
   .calendar-widget {
     width: 340px;
+  }
+}
+
+/* ---- Mobile fixes ---- */
+@media (max-width: 767px) {
+  /* Sobrescreve o padding da classe .card com !important */
+  .calendar-widget {
+    padding: 12px !important;
+  }
+
+  /* Reduz o gap entre células para caber as 7 colunas */
+  .calendar-weekdays {
+    gap: 2px;
+  }
+  .calendar-grid {
+    gap: 2px;
+  }
+
+  /* Remove o max-width fixo — deixa o grid distribuir igualmente */
+  .calendar-day {
+    max-width: none;
+    font-size: 13px;
+    border-radius: var(--radius-sm);
+    padding: 2px;
+  }
+
+  .calendar-weekdays span {
+    font-size: 10px;
+    letter-spacing: 0;
+    padding: 2px 0;
+  }
+
+  /* Compactar o card de agendamento no mobile */
+  .appointment-card-main {
+    padding: var(--space-md);
+    gap: var(--space-sm);
+  }
+
+  .appointment-time-block {
+    min-width: 52px;
+    padding: var(--space-xs) var(--space-sm);
+  }
+
+  .appointment-details {
+    padding: 0 var(--space-md) var(--space-md);
+  }
+
+  .appointment-details-grid {
+    padding: var(--space-md);
+  }
+
+  /* Ocultar o badge de status no card compacto mobile */
+  .appointment-card-main .badge {
+    display: none;
   }
 }

@@ -9,6 +9,7 @@ from app.db.repositorio import (
     get_services_by_provider,
     get_provider_by_id,
     update_service,
+    delete_service,
 )
 from app.db.session import get_db
 
@@ -73,3 +74,24 @@ def update_service_route(
     except Exception as exc:
         raise HTTPException(status_code=500, detail=f"Erro desconhecido: {str(exc)}")
     return service
+
+
+@router_service.delete("/{provider_id}/{service_id}", status_code=204, dependencies=[Depends(require_provider)])
+def delete_service_route(
+    provider_id: int = Path(..., gt=0, le=2147483647),
+    service_id: int = Path(..., gt=0, le=2147483647),
+    db: Session = Depends(get_db),
+):
+    """Exclui um serviço existente."""
+    try:
+        deleted = delete_service(db, provider_id, service_id)
+        if not deleted:
+            raise HTTPException(
+                status_code=404,
+                detail="Serviço não encontrado",
+            )
+    except HTTPException:
+        raise
+    except Exception as exc:
+        raise HTTPException(status_code=500, detail=f"Erro desconhecido: {str(exc)}")
+    return None

@@ -260,6 +260,21 @@ def update_service(
     return service
 
 
+def delete_service(
+    db: Session,
+    provider_id: int,
+    service_id: int,
+) -> bool:
+    """Deleta um serviço existente. Retorna True se deletou, False caso não encontre."""
+    service = get_service_by_id(db, provider_id, service_id)
+    if service is None:
+        return False
+    
+    db.delete(service)
+    db.commit()
+    return True
+
+
 # ==============================================================================
 # APPOINTMENT REPOSITORY
 # ==============================================================================

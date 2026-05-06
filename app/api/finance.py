@@ -5,8 +5,9 @@ from app.db.models import FinanceType
 from app.db.repositorio import create_finance, get_all_finances
 from app.core.schemas import FinanceInput, FinanceOutput
 from typing import List
+from app.api.auth import require_provider
 
-router_finance = APIRouter(prefix="/finance", tags=["Finance"])
+router_finance = APIRouter(prefix="/finance", tags=["Finance"], dependencies=[Depends(require_provider)])
 
 @router_finance.post("/", response_model=FinanceOutput, status_code=status.HTTP_201_CREATED)
 def post_finance(finance: FinanceInput, db: Session = Depends(get_db)):
