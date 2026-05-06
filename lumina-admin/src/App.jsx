@@ -6,7 +6,9 @@ import CalendarPage from './pages/CalendarPage';
 import ProvidersPage from './pages/ProvidersPage';
 import ServicesPage from './pages/ServicesPage';
 import AppointmentsPage from './pages/AppointmentsPage';
+import FinancePage from './pages/FinancePage';
 import './index.css';
+
 
 function ProtectedRoute({ children }) {
   const { user, loading } = useAuth();
@@ -27,7 +29,9 @@ function AppRoutes() {
         <Route path="providers" element={<ProvidersPage />} />
         <Route path="services" element={<ServicesPage />} />
         <Route path="appointments" element={<AppointmentsPage />} />
+        <Route path="finance" element={<FinancePage />} />
       </Route>
+
       <Route path="*" element={<Navigate to="/" replace />} />
     </Routes>
   );

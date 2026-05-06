@@ -114,3 +114,21 @@ class ResetPasswordInput(BaseModel):
     email: EmailStr
     code: str = Field(min_length=6, max_length=6)
     new_password: str = Field(min_length=6, max_length=72)
+
+class FinanceInput(BaseModel):
+    description: str = Field(min_length=1, max_length=200)
+    type: str = Field(min_length=1, max_length=20)
+    amount: float = Field(ge=0, le=10000000)
+
+    @field_validator('type')
+    @classmethod
+    def type_to_upper(cls, v: str) -> str:
+        return v.upper() if v else v
+
+class FinanceOutput(BaseModel):
+    id: int = Field(gt=0)
+    description: str = Field(max_length=200)
+    type: str = Field(max_length=20)
+    amount: float = Field(ge=0)
+    date: datetime
+    model_config = ConfigDict(from_attributes=True)

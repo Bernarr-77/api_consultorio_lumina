@@ -1,4 +1,4 @@
-from app.db.models import User, Provider, Service, StatusProvider, Status, Appointments,UserRefreshToken
+from app.db.models import User, Provider, Service, StatusProvider, Status, Appointments, UserRefreshToken, Finance, FinanceType
 from sqlalchemy.orm import Session
 from sqlalchemy import select
 from typing import Optional
@@ -445,3 +445,30 @@ def add_token_in_db(
     db.commit()
     db.refresh(new_token)
     return new_token
+
+# ==============================================================================
+# FINANCE REPOSITORY
+# ==============================================================================
+
+
+def create_finance(
+    db: Session,
+    description: str,
+    finance_type: "FinanceType",
+    amount: float,
+) -> "Finance":
+    """Cria uma nova transação financeira."""
+    nova_financa = Finance(
+        description=description,
+        type=finance_type,
+        amount=amount,
+    )
+    db.add(nova_financa)
+    db.commit()
+    db.refresh(nova_financa)
+    return nova_financa
+
+
+def get_all_finances(db: Session) -> list["Finance"]:
+    """Busca todas as transações financeiras ordenadas por data."""
+    return list(db.scalars(select(Finance).order_by(Finance.date.desc())).all())

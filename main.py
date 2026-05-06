@@ -5,7 +5,9 @@ from app.api.provider import router_provider
 from app.api.services import router_service
 from app.api.agendamentos import router_agendamentos
 from app.api.auth import router_auth
+from app.api.finance import router_finance
 from fastapi.middleware.cors import CORSMiddleware
+
 from fastapi.staticfiles import StaticFiles
 
 app = FastAPI(title="Agendamento API", version="1.0.0")
@@ -43,3 +45,4 @@ app.include_router(router_provider)
 app.include_router(router_service)
 app.include_router(router_agendamentos)
 app.include_router(router_auth)
+app.include_router(router_finance)

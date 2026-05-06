@@ -97,3 +97,15 @@ class UserRefreshToken(Base):
     revoked: Mapped[bool] = mapped_column(default=False)
 
     token_usuario: Mapped['User'] = relationship(back_populates='usuario_token')
+
+class FinanceType(enum.Enum):
+    INCOME = "INCOME"
+    EXPENSE = "EXPENSE"
+
+class Finance(Base):
+    __tablename__ = "financas"
+    id: Mapped[int] = mapped_column(primary_key=True, autoincrement=True)
+    description: Mapped[str] = mapped_column(String(200), nullable=False)
+    type: Mapped[FinanceType] = mapped_column(Enum(FinanceType), nullable=False)
+    amount: Mapped[float] = mapped_column(nullable=False)
+    date: Mapped[datetime] = mapped_column(default=datetime.now)

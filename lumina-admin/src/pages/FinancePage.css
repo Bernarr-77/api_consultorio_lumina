@@ -1,0 +1,327 @@
+.finance-page {
+  padding: 2rem;
+  animation: fadeInUp 400ms ease forwards;
+}
+
+.finance-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-bottom: 2rem;
+}
+
+.finance-header h1 {
+  font-size: var(--text-3xl);
+  font-family: var(--font-headline);
+  color: var(--text-primary);
+}
+
+/* ---- Summary Cards ---- */
+.finance-summary {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
+  gap: 1.5rem;
+  margin-bottom: 2rem;
+}
+
+.summary-card {
+  background: var(--bg-elevated);
+  padding: 1.5rem;
+  border-radius: var(--radius-lg);
+  box-shadow: var(--shadow-sm);
+  border: 1px solid var(--neutral-200);
+  display: flex;
+  align-items: center;
+  gap: 1rem;
+  transition: all var(--transition-base);
+}
+
+.summary-card:hover {
+  transform: translateY(-2px);
+  box-shadow: var(--shadow-md);
+}
+
+.summary-icon {
+  width: 48px;
+  height: 48px;
+  border-radius: var(--radius-md);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  flex-shrink: 0;
+}
+
+.income-icon {
+  background: rgba(76, 175, 80, 0.12);
+  color: var(--success);
+}
+
+.expense-icon {
+  background: rgba(229, 57, 53, 0.12);
+  color: var(--error);
+}
+
+.balance-icon {
+  background: var(--primary-subtle);
+  color: var(--primary-darker);
+}
+
+.summary-text {
+  display: flex;
+  flex-direction: column;
+  gap: 0.25rem;
+}
+
+.summary-card h3 {
+  font-size: var(--text-xs);
+  color: var(--text-tertiary);
+  text-transform: uppercase;
+  letter-spacing: 0.06em;
+  font-weight: var(--weight-semibold);
+}
+
+.summary-card .amount {
+  font-size: var(--text-2xl);
+  font-weight: var(--weight-bold);
+  font-family: var(--font-headline);
+}
+
+.summary-card.income .amount { color: var(--success); }
+.summary-card.expense .amount { color: var(--error); }
+.summary-card.balance .amount { color: var(--primary-darker); }
+
+/* ---- Charts Row ---- */
+.finance-charts {
+  display: grid;
+  grid-template-columns: 2fr 1fr;
+  gap: 1.5rem;
+  margin-bottom: 2rem;
+}
+
+@media (max-width: 900px) {
+  .finance-charts {
+    grid-template-columns: 1fr;
+  }
+}
+
+.chart-container-lg {
+  height: 280px;
+  width: 100%;
+}
+
+.chart-container-pie {
+  height: 280px;
+  width: 100%;
+}
+
+/* ---- Section Card ---- */
+.finance-section {
+  background: var(--bg-elevated);
+  padding: 1.75rem;
+  border-radius: var(--radius-lg);
+  box-shadow: var(--shadow-sm);
+  border: 1px solid var(--neutral-200);
+}
+
+.finance-section h2 {
+  font-size: var(--text-lg);
+  margin-bottom: 1.25rem;
+  color: var(--text-primary);
+  font-family: var(--font-headline);
+  border-bottom: 1px solid var(--neutral-200);
+  padding-bottom: 0.75rem;
+}
+
+/* ---- Form + Transactions ---- */
+.finance-content {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 1.5rem;
+}
+
+@media (max-width: 900px) {
+  .finance-content {
+    grid-template-columns: 1fr;
+  }
+}
+
+.finance-form {
+  display: flex;
+  flex-direction: column;
+  gap: 1.25rem;
+}
+
+.form-group {
+  display: flex;
+  flex-direction: column;
+  gap: 0.5rem;
+}
+
+.form-group label {
+  font-family: var(--font-headline);
+  font-weight: var(--weight-medium);
+  font-size: var(--text-sm);
+  color: var(--text-secondary);
+  letter-spacing: 0.02em;
+}
+
+/* ---- Type Toggle ---- */
+.type-toggle {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 0.75rem;
+}
+
+.type-toggle-btn {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 0.5rem;
+  padding: 0.85rem 1rem;
+  border-radius: var(--radius-md);
+  border: 2px solid var(--neutral-200);
+  background: var(--bg-elevated);
+  color: var(--text-tertiary);
+  font-weight: var(--weight-semibold);
+  font-size: var(--text-sm);
+  cursor: pointer;
+  transition: all 0.2s ease;
+}
+
+.type-toggle-btn:hover {
+  border-color: var(--neutral-400);
+  color: var(--text-primary);
+}
+
+.type-toggle-btn.income-toggle.active {
+  border-color: var(--success);
+  background: rgba(76, 175, 80, 0.08);
+  color: var(--success);
+  box-shadow: 0 0 0 3px rgba(76, 175, 80, 0.1);
+}
+
+.type-toggle-btn.expense-toggle.active {
+  border-color: var(--error);
+  background: rgba(229, 57, 53, 0.08);
+  color: var(--error);
+  box-shadow: 0 0 0 3px rgba(229, 57, 53, 0.1);
+}
+
+/* ---- Transactions List ---- */
+.transactions-list {
+  display: flex;
+  flex-direction: column;
+  gap: 0.75rem;
+  max-height: 420px;
+  overflow-y: auto;
+  padding-right: 0.25rem;
+}
+
+.transaction-item {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  padding: 1rem;
+  background: var(--bg-primary);
+  border-radius: var(--radius-md);
+  border: 1px solid var(--neutral-200);
+  transition: all 0.2s ease;
+}
+
+.transaction-item:hover {
+  transform: translateX(4px);
+  box-shadow: var(--shadow-sm);
+}
+
+.transaction-left {
+  display: flex;
+  align-items: center;
+  gap: 0.75rem;
+}
+
+.transaction-icon-badge {
+  width: 36px;
+  height: 36px;
+  border-radius: var(--radius-sm);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  flex-shrink: 0;
+}
+
+.transaction-icon-badge.income {
+  background: rgba(76, 175, 80, 0.12);
+  color: var(--success);
+}
+
+.transaction-icon-badge.expense {
+  background: rgba(229, 57, 53, 0.12);
+  color: var(--error);
+}
+
+.transaction-info {
+  display: flex;
+  flex-direction: column;
+  gap: 0.15rem;
+}
+
+.transaction-desc {
+  font-weight: var(--weight-semibold);
+  font-size: var(--text-sm);
+  color: var(--text-primary);
+}
+
+.transaction-date {
+  font-size: var(--text-xs);
+  color: var(--text-tertiary);
+}
+
+.transaction-amount {
+  font-weight: var(--weight-bold);
+  font-size: var(--text-base);
+  font-family: var(--font-headline);
+  white-space: nowrap;
+}
+
+.transaction-amount.income { color: var(--success); }
+.transaction-amount.expense { color: var(--error); }
+
+/* ---- Chart Tooltip ---- */
+.finance-tooltip {
+  background: var(--bg-elevated);
+  padding: 0.75rem 1rem;
+  border-radius: var(--radius-md);
+  box-shadow: var(--shadow-lg);
+  border: 1px solid var(--neutral-200);
+}
+
+.finance-tooltip-label {
+  font-size: var(--text-xs);
+  color: var(--text-tertiary);
+  margin-bottom: 0.35rem;
+  font-weight: var(--weight-medium);
+  text-transform: uppercase;
+  letter-spacing: 0.05em;
+}
+
+.finance-tooltip-value {
+  font-size: var(--text-sm);
+  font-weight: var(--weight-semibold);
+}
+
+/* ---- No Data ---- */
+.no-data {
+  text-align: center;
+  color: var(--text-tertiary);
+  padding: 3rem 0;
+  font-size: var(--text-sm);
+}
+
+/* ---- Recharts dark mode compatibility ---- */
+.recharts-legend-item-text {
+  color: var(--text-secondary) !important;
+}
+
+.recharts-text {
+  fill: var(--text-tertiary);
+}
